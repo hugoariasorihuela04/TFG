@@ -37,20 +37,10 @@ docker compose build --no-cache
 ./start.ps1
 ```
 
-Cuando veas:
-
-anti-deepfake-frontend exited with code 1
-anti-deepfake-backend   | INFO:     127.0.0.1:54898 - "GET /docs HTTP/1.1" 200 OK
-anti-deepfake-backend   | INFO:     127.0.0.1:38816 - "GET /docs HTTP/1.1" 200 OK
-anti-deepfake-backend   | INFO:     127.0.0.1:57658 - "GET /docs HTTP/1.1" 200 OK
-
-Realiza el paso 3
 
 ### Paso 3: Acceder a la aplicación
 - Frontend: https://localhost:8443
 - Backend: http://localhost:8000/docs
-
-Es normal si tienes que recargar algunas veces la página del frontend para que cargue correctamente debido a que el backend carga más lento que el frontend. Esto se debe a que el backend tiene que cargar los modelos de deepfake y de lenguaje, lo cual puede tardar un poco.
 
 -----
 

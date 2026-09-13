@@ -5,153 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Autenticación Facial Anti-Deepfake</title>
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+      /* Minimal, neutral styles only — preserve structure and classes/IDs */
+      * { box-sizing: border-box; margin: 0; padding: 0; }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+        background: #fafafa;
+        color: #111;
+        line-height: 1.4;
+        padding: 24px;
       }
 
       .container {
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        padding: 40px;
-        max-width: 600px;
-        width: 100%;
+        max-width: 640px;
+        margin: 24px auto;
+        background: #ffffff;
+        color: inherit;
+        border: 1px solid #e6e6e6;
+        border-radius: 6px;
+        padding: 20px;
       }
 
       h1 {
-        color: #333;
-        margin-bottom: 10px;
-        font-size: 28px;
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 6px;
       }
 
       .subtitle {
-        color: #666;
-        margin-bottom: 30px;
-        font-size: 14px;
+        font-size: 13px;
+        color: #555;
+        margin-bottom: 16px;
       }
 
       .video-container {
-        position: relative;
-        margin: 30px 0;
-        border-radius: 12px;
+        margin: 18px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
         overflow: hidden;
         background: #000;
         aspect-ratio: 4 / 3;
       }
 
-      video {
-        width: 100%;
-        height: 100%;
-        display: block;
-      }
+      video { display: block; width: 100%; height: 100%; }
+      canvas { display: none; }
 
-      canvas {
-        display: none;
-      }
-
-      .button-container {
-        display: flex;
-        gap: 10px;
-        margin: 20px 0;
-      }
+      .button-container { display: flex; gap: 10px; margin: 14px 0; }
 
       button {
         flex: 1;
-        padding: 12px 24px;
-        font-size: 16px;
-        font-weight: 600;
-        border: none;
-        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 14px;
+        border-radius: 4px;
+        border: 1px solid #222;
+        background: transparent;
+        color: #222;
         cursor: pointer;
-        transition: all 0.3s ease;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
       }
 
-      button:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
-      }
+      button:disabled { opacity: 0.6; cursor: not-allowed; }
 
-      button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
+      .info-box {
+        background: transparent;
+        border-left: none;
+        padding: 8px 0;
+        margin: 12px 0;
+        color: #444;
+        font-size: 13px;
       }
 
       .result-container {
-        margin-top: 30px;
-        padding: 20px;
-        background: #f5f5f5;
-        border-radius: 8px;
-        border-left: 4px solid #667eea;
-        min-height: 100px;
+        margin-top: 16px;
+        padding: 12px;
+        background: #fafafa;
+        border: 1px solid #eee;
+        border-radius: 4px;
+        min-height: 72px;
       }
 
-      pre {
-        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-        font-size: 13px;
-        color: #333;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-      }
+      pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace; font-size: 13px; color: #111; white-space: pre-wrap; }
 
-      .result-container.success {
-        border-left-color: #48bb78;
-        background: #f0fff4;
-      }
+      /* Keep status color hints subtle */
+      .result-container.success { border-color: #cfead5; background: #fbfffb; }
+      .result-container.error   { border-color: #f1d3d3; background: #fffaf9; }
+      .result-container.loading { border-color: #efe1d6; background: #fffdf8; }
 
-      .result-container.error {
-        border-left-color: #f56565;
-        background: #fff5f5;
-      }
+      .status-message { text-align: center; color: #666; font-style: normal; }
 
-      .result-container.loading {
-        border-left-color: #ed8936;
-        background: #fffaf0;
-      }
-
-      .status-message {
-        text-align: center;
-        color: #666;
-        font-style: italic;
-      }
-
-      .info-box {
-        background: #edf2f7;
-        border-radius: 8px;
-        padding: 15px;
-        margin: 20px 0;
-        border-left: 4px solid #4299e1;
-        font-size: 13px;
-        color: #2d3748;
-      }
-
-      .loading-spinner {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid #f3f3f3;
-        border-top: 3px solid #667eea;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
+      /* Minimal spinner (kept small and neutral) */
+      .loading-spinner { width: 16px; height: 16px; border: 2px solid #ddd; border-top-color: #888; border-radius: 50%; animation: spin 1s linear infinite; display: inline-block; }
+      @keyframes spin { to { transform: rotate(360deg); } }
     </style>
   </head>
   <body>

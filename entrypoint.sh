@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Script para generar certificados SSL autofirmados en Docker
 CERT_DIR="/app"

@@ -7,7 +7,7 @@ RUN apk add --no-cache openssl
 
 COPY frontend /app
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN sed -i 's/\r$//' /entrypoint.sh && chmod +x /entrypoint.sh
 
 # Crear configuración de Nginx para HTTPS
 RUN mkdir -p /etc/nginx/conf.d && \

@@ -1,112 +1,95 @@
-const video = document.getElementById("video");
-const canvas = document.getElementById("canvas");
-const result = document.getElementById("result");
-const button = document.getElementById("auth-btn");
+const videoElemento = document.getElementById("video");
+const lienzo = document.getElementById("canvas");
+const resultado = document.getElementById("result");
+const botonAutenticacion = document.getElementById("auth-btn");
 
-// Detectar automáticamente la IP y puerto del backend
-// El backend debe estar accesible desde el mismo host que el frontend
-// pero en puerto 8000 en lugar de 8443
-const API_BASE = `http://${window.location.hostname}:8000`;
+// Detecta backend en el mismo host, puerto 8000
+const URL_API = `http://${window.location.hostname}:8000`;
 
-console.log(`Usando API_BASE: ${API_BASE}`);
+console.log(`Usando URL_API: ${URL_API}`);
 
-async function initCamera() {
-    const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" },
-    });
-
-    video.srcObject = stream;
+async function iniciarCamara() {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+    videoElemento.srcObject = stream;
 }
 
-function captureBlob() {
+function capturarImagen() {
     return new Promise((resolve, reject) => {
-        const context = canvas.getContext("2d");
-        const track = video.srcObject.getVideoTracks()[0];
+        const contexto = lienzo.getContext("2d");
+        const track = videoElemento.srcObject.getVideoTracks()[0];
         const settings = track.getSettings();
 
-        canvas.width = settings.width || video.videoWidth || 480;
-        canvas.height = settings.height || video.videoHeight || 360;
+        lienzo.width = settings.width || videoElemento.videoWidth || 480;
+        lienzo.height = settings.height || videoElemento.videoHeight || 360;
 
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        contexto.drawImage(videoElemento, 0, 0, lienzo.width, lienzo.height);
 
-        canvas.toBlob(
-            (blob) => {
-                if (!blob) {
-                    reject(new Error("No se pudo capturar la imagen"));
-                    return;
-                }
-                resolve(blob);
-            },
-            "image/jpeg",
-            0.9,
-        );
+        lienzo.toBlob((blob) => {
+            if (!blob) {
+                reject(new Error("No se pudo capturar la imagen"));
+                return;
+            }
+            resolve(blob);
+        }, "image/jpeg", 0.9);
     });
 }
 
-async function authenticateOnce() {
-    const blob = await captureBlob();
+async function autenticarUnaVez() {
+    const blob = await capturarImagen();
     const formData = new FormData();
     formData.append("file", blob, "captura.jpg");
- 
-    const response = await fetch(`${API_BASE}/api/autenticar`, {
-        method: "POST",
-        body: formData,
-    });
- 
-    if (!response.ok) {
-        throw new Error(`Error en servidor: ${response.status}`);
-    }
- 
-    const data = await response.json();
-    return data;
+
+    const response = await fetch(`${URL_API}/api/autenticar`, { method: "POST", body: formData });
+    if (!response.ok) throw new Error(`Error en servidor: ${response.status}`);
+    return await response.json();
 }
- 
-button.addEventListener("click", async () => {
-    button.disabled = true;
-    result.textContent = "🔄 Autenticando...";
-    result.parentElement.classList.remove("success", "error");
-    result.parentElement.classList.add("loading");
- 
+
+botonAutenticacion.addEventListener("click", async () => {
+    botonAutenticacion.disabled = true;
+    resultado.textContent = "Autenticando...";
+    resultado.parentElement.classList.remove("success", "error");
+    resultado.parentElement.classList.add("loading");
+
     try {
         const intentos = [];
-        let final = { autenticado: false };
- 
+        let resultadoFinal = { autenticado: false };
+
         for (let i = 0; i < 10; i += 1) {
-            const data = await authenticateOnce();
+            const data = await autenticarUnaVez();
             intentos.push(data);
- 
+
             if (data.autenticado === true) {
-                final = data;
+                resultadoFinal = data;
                 break;
             }
- 
-            result.textContent = `🔄 Intento ${i + 1}/10...`;
+
+            resultado.textContent = `Intento ${i + 1}/10...`;
             await new Promise((r) => setTimeout(r, 150));
         }
- 
-        const resultData = {
-            autenticado: final.autenticado === true,
+
+        const datosResultado = {
+            autenticado: resultadoFinal.autenticado === true,
             intentos_realizados: intentos.length,
-            confianza: final.detalles?.confianza.toFixed(2) || "N/A",
+            confianza: resultadoFinal.detalles?.confianza.toFixed(2) || "N/A",
         };
- 
-        result.parentElement.classList.remove("loading");
-        if (final.autenticado === true) {
-            result.parentElement.classList.add("success");
-            result.textContent = `✅ ¡Autenticación exitosa!\n\n${JSON.stringify(resultData, null, 2)}`;
+
+        resultado.parentElement.classList.remove("loading");
+        if (resultadoFinal.autenticado === true) {
+            resultado.parentElement.classList.add("success");
+            resultado.textContent = `¡Autenticación exitosa!\n\n${JSON.stringify(datosResultado, null, 2)}`;
         } else {
-            result.parentElement.classList.add("error");
-            result.textContent = `❌ Autenticación fallida\n\n${JSON.stringify(resultData, null, 2)}`;
+            resultado.parentElement.classList.add("error");
+            resultado.textContent = `Autenticación fallida\n\n${JSON.stringify(datosResultado, null, 2)}`;
         }
     } catch (error) {
-        result.parentElement.classList.remove("loading");
-        result.parentElement.classList.add("error");
-        result.textContent = `❌ Error: ${error.message}`;
+        resultado.parentElement.classList.remove("loading");
+        resultado.parentElement.classList.add("error");
+        resultado.textContent = `Error: ${error.message}`;
     } finally {
-        button.disabled = false;
+        botonAutenticacion.disabled = false;
     }
 });
 
-initCamera().catch((error) => {
-    result.textContent = `No se pudo acceder a la cámara: ${error.message}`;
+iniciarCamara().catch((error) => {
+    resultado.textContent = `No se pudo acceder a la cámara: ${error.message}`;
 });

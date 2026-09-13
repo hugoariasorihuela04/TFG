@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Autenticación Facial Anti-Deepfake</title>
     <style>
-      /* Minimal, neutral styles only — preserve structure and classes/IDs */
+      /* Estilos mínimos — mantener IDs y clases */
       * { box-sizing: border-box; margin: 0; padding: 0; }
 
       body {
@@ -85,22 +85,22 @@
 
       pre { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace; font-size: 13px; color: #111; white-space: pre-wrap; }
 
-      /* Keep status color hints subtle */
+      /* Mantener indicaciones de estado discretas */
       .result-container.success { border-color: #cfead5; background: #fbfffb; }
       .result-container.error   { border-color: #f1d3d3; background: #fffaf9; }
       .result-container.loading { border-color: #efe1d6; background: #fffdf8; }
 
       .status-message { text-align: center; color: #666; font-style: normal; }
 
-      /* Minimal spinner (kept small and neutral) */
+      /* Spinner mínimo */
       .loading-spinner { width: 16px; height: 16px; border: 2px solid #ddd; border-top-color: #888; border-radius: 50%; animation: spin 1s linear infinite; display: inline-block; }
       @keyframes spin { to { transform: rotate(360deg); } }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1>🔐 Autenticación Facial</h1>
-      <p class="subtitle">Sistema Anti-Deepfake basado en Detección de Vivacidad</p>
+      <h1>Autenticación Facial</h1>
+      <p class="subtitle">Detección de vivacidad para evitar deepfakes</p>
 
       <div class="video-container">
         <video id="video" autoplay playsinline></video>
@@ -112,7 +112,7 @@
       </div>
 
       <div class="info-box">
-        ℹ️ Asegúrate de que tu cara esté completamente visible en la cámara para una mejor detección.
+        Mantén la cara visible y bien iluminada.
       </div>
 
       <div class="result-container">

@@ -11,18 +11,18 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-class AttemptLog(Base):
-    """Audit table for authentication attempts (without image storage)."""
+class RegistroIntento(Base):
+    """Registro de intentos de autenticación."""
 
     __tablename__ = "attempt_logs"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, nullable=False)
-    result = Column(Boolean, nullable=False)
-    confidence = Column(Float, nullable=False, default=0.0)
+    fecha = Column('timestamp', DateTime, default=datetime.utcnow, nullable=False)
+    resultado = Column('result', Boolean, nullable=False)
+    confianza = Column('confidence', Float, nullable=False, default=0.0)
 
 
-def get_db():
+def obtener_db():
     db = SessionLocal()
     try:
         yield db

@@ -1,26 +1,26 @@
 from deepface import DeepFace
-SPOOF_MIN_SCORE = 0.99
+MIN_PUNTAJE_ANTI_SPOOF = 0.99
 
-def _to_jsonable(value):
+def _a_json(value):
     if isinstance(value, dict):
-        return {str(k): _to_jsonable(v) for k, v in value.items()}
+        return {str(k): _a_json(v) for k, v in value.items()}
     if isinstance(value, (list, tuple)):
-        return [_to_jsonable(v) for v in value]
+        return [_a_json(v) for v in value]
     if isinstance(value, (str, int, float, bool)) or value is None:
         return value
     return str(value)
 
 
-def analyze_liveness(image_rgb):
-    """Runs DeepFace anti-spoofing inference and normalizes the output."""
-    result = DeepFace.extract_faces(img_path=image_rgb, detector_backend="opencv", anti_spoofing=True)
+def analizar_vivacidad(imagen_rgb):
+    """Analiza vivacidad y normaliza la salida."""
+    result = DeepFace.extract_faces(img_path=imagen_rgb, detector_backend="opencv", anti_spoofing=True)
 
     if not result:
         raise ValueError("No se detectó ninguna cara")
 
     face = result[0]
 
-    # Different deepface versions may expose different liveness keys.
+    # Distintas versiones de deepface usan claves distintas.
     is_real = face.get("is_real")
     if is_real is None:
         spoof_flag = face.get("spoof")
@@ -30,7 +30,7 @@ def analyze_liveness(image_rgb):
     if is_real is None:
         raise ValueError("No se pudo determinar la vivacidad del rostro")
 
-    confidence = (
+    confianza = (
         face.get("antispoof_score")
         or face.get("anti_spoofing_score")
         or face.get("confidence")
@@ -39,7 +39,7 @@ def analyze_liveness(image_rgb):
     )
 
     return {
-        "autenticado": bool(is_real) and float(confidence) >= SPOOF_MIN_SCORE,
-        "confianza": float(confidence),
-        "raw": _to_jsonable(face),
+        "autenticado": bool(is_real) and float(confianza) >= MIN_PUNTAJE_ANTI_SPOOF,
+        "confianza": float(confianza),
+        "raw": _a_json(face),
     }

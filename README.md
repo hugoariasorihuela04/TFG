@@ -48,4 +48,4 @@ docker compose build --no-cache
 ---
 
 # MODIFICAR CUAN ESTRICTO ES EL MODELO DE LENGUAJE
-Para modificar la estricticidad del modelo de lenguaje, puedes cambiar el valor de la variable SPOOF_MIN_SCORE en el archivo `app/core/deepface_engine.py`.
+Para modificar la estricticidad del modelo de lenguaje, puedes cambiar el valor de la variable MIN_PUNTAJE_ANTI_SPOOF en el archivo `app/core/deepface_engine.py`.

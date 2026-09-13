@@ -1,10 +1,8 @@
-# README
-
 ## COMO INICIAR EN DOCKER
 ### Paso 1: Clonar el repositorio y entrar en la carpeta del proyecto
 ```bash
 git clone https://github.com/hugoariasorihuela04/TFG.git
-cd TFG\PROTOTIPO-TFG
+cd TFG
 ```
 
 ### Paso 2: Ejecutar el script de inicio en docker
@@ -44,8 +42,8 @@ docker compose build --no-cache
 - Frontend: https://localhost:8443
 - Backend: http://localhost:8000/docs
 
----
----
+-----
 
-# MODIFICAR CUAN ESTRICTO ES EL MODELO DE LENGUAJE
+## MODIFICAR CUAN ESTRICTO ES EL MODELO DE LENGUAJE
 Para modificar la estricticidad del modelo de lenguaje, puedes cambiar el valor de la variable MIN_PUNTAJE_ANTI_SPOOF en el archivo `app/core/deepface_engine.py`.
+

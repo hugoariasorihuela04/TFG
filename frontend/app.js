@@ -70,7 +70,7 @@ botonAutenticacion.addEventListener("click", async () => {
         const datosResultado = {
             autenticado: resultadoFinal.autenticado === true,
             intentos_realizados: intentos.length,
-            confianza: resultadoFinal.detalles?.confianza.toFixed(2) || "N/A",
+            confianza: resultadoFinal.detalles?.confianza.toFixed(5) || "N/A",
         };
 
         resultado.parentElement.classList.remove("loading");

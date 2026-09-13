@@ -1,0 +1,43 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: anti-deepfake-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+      - ./audit.db:/app/audit.db
+    environment:
+      - CORS_ORIGINS=["*"]
+      - PYTHONUNBUFFERED=1
+    networks:
+      - anti-deepfake-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: anti-deepfake-frontend
+    ports:
+      - "8443:8443"
+    # Modifica esta parte añadiendo el entrypoint vacío:
+    entrypoint: [ ]
+    command: [ "nginx", "-g", "daemon off;" ]
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - anti-deepfake-network
+
+
+networks:
+  anti-deepfake-network:
+    driver: bridge

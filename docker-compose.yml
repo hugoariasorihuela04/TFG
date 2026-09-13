@@ -8,9 +8,10 @@ services:
       - "8000:8000"
     volumes:
       - ./app:/app/app
-      - ./audit.db:/app/audit.db
+      - ./data:/data
     environment:
       - CORS_ORIGINS=["*"]
+      - DB_URL=sqlite:////data/audit.db
       - PYTHONUNBUFFERED=1
     networks:
       - anti-deepfake-network

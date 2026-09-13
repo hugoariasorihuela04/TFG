@@ -10,20 +10,35 @@ router = APIRouter()
 
 @router.post("/autenticar")
 async def autenticar(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    """Authenticates a face image without writing files to disk."""
+    """Authenticates a face image without writing files to disk.
+
+    Adds lightweight logging of the received payload size and any decoding
+    errors to help diagnose empty/invalid uploads (returns the same HTTP
+    errors as before).
+    """
+    import logging
+
+    logger = logging.getLogger(__name__)
+
     bytes_data = await file.read()
+    logger.info("/autenticar received file: filename=%s, size=%d", getattr(file, 'filename', None), len(bytes_data) if bytes_data is not None else 0)
+
     if not bytes_data:
+        # Keep original behavior but provide a clearer log entry
+        logger.warning("No image bytes received in /autenticar request (empty upload)")
         raise HTTPException(status_code=400, detail="No se recibió ninguna imagen")
 
     try:
         image_rgb = decode_image_from_bytes(bytes_data)
         analysis = analyze_liveness(image_rgb)
     except ValueError as exc:
+        logger.warning("Image decode error: %s", str(exc))
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:  # pragma: no cover - defensive
+        logger.exception("Unexpected error during liveness analysis")
         raise HTTPException(status_code=500, detail="Error interno en la inferencia") from exc
 
-    log = AttemptLog(result=analysis["autenticado"], confidence=analysis["confianza"])
+    log = AttemptLog(result=analysis["autenticado"], confidence=analysis["confianza"]) 
     db.add(log)
     db.commit()
 

@@ -32,8 +32,17 @@ async def autenticar(file: UploadFile = File(...), db: Session = Depends(get_db)
         image_rgb = decode_image_from_bytes(bytes_data)
         analysis = analyze_liveness(image_rgb)
     except ValueError as exc:
-        logger.warning("Image decode error: %s", str(exc))
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
+        msg = str(exc)
+        logger.warning("Image processing error: %s", msg)
+        # For any image decoding/liveness ValueError, return a friendly response so the frontend
+        # can prompt the user to retry instead of receiving an HTTP 400 error.
+        return {
+            "autenticado": False,
+            "detalles": {
+                "confianza": 0.0,
+                "mensaje": "Por favor, enfoca mejor la cara y asegúrate de que esté claramente visible."
+            },
+        }
     except Exception as exc:  # pragma: no cover - defensive
         logger.exception("Unexpected error during liveness analysis")
         raise HTTPException(status_code=500, detail="Error interno en la inferencia") from exc
